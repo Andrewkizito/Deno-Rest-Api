@@ -45,8 +45,21 @@ class Router {
   ): Promise<Response> {
     for (const [_path, _pattern] of this.dynamicPathsQueries) {
       const matched = _pattern.test(path);
+
       if (matched) {
-        return await this.lookUpStaticPath(_path, method, _req, _info);
+        const pathParts = path.split("/");
+        const params: Record<string, string> = {};
+
+        _path.split("/").forEach((p, i) => {
+          if (p.startsWith(":")) {
+            params[p.replace(":", "")] = pathParts[i];
+          }
+        });
+
+        return await this.lookUpStaticPath(_path, method, _req, {
+          ..._info,
+          params,
+        } as Deno.ServeHandlerInfo);
       }
     }
 
