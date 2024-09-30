@@ -1,6 +1,6 @@
 import { createStringHashMap } from "./common.ts";
 
-type Method = "GET" | "POST" | "DELETE";
+type Method = "GET" | "POST" | "DELETE" | "OPTIONS";
 
 class Router {
   private routes: Map<string, Partial<Record<Method, Deno.ServeHandler>>>;
@@ -112,6 +112,16 @@ class Router {
   handler: Deno.ServeHandler = async (req, info): Promise<Response> => {
     const path = req.url.split(`${this.port}`)[1];
     const method = req.method.toUpperCase() as Method;
+
+    if (method === "OPTIONS") {
+      return new Response("", {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "*",
+        },
+      });
+    }
 
     return await this.lookUpStaticPath(path, method, req, info);
   };
