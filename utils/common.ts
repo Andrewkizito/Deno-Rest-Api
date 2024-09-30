@@ -13,3 +13,8 @@ export function createStringHashMap(input: string): Record<string, number[]> {
 
   return indexMap;
 }
+
+export const headers = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "*",
+};
