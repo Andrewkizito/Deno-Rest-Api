@@ -1,4 +1,4 @@
-import { addTask, deleteTask, getTasks } from "./controllers/tasks.ts";
+import { addTask, deleteTask, getTask, getTasks } from "./controllers/tasks.ts";
 import { initDB } from "./utils/db.ts";
 import Router from "./utils/router.ts";
 import { load } from "https://deno.land/std@0.206.0/dotenv/mod.ts";
@@ -15,6 +15,7 @@ const router = new Router(PORT);
 // Tasks
 router.get("/tasks", getTasks);
 router.post("/tasks", addTask);
+router.get("/tasks/:id", getTask);
 router.delete("/tasks/:id", deleteTask);
 
 Deno.serve(

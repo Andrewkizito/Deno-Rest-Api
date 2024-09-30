@@ -1,3 +1,4 @@
+import { headers } from "../utils/common.ts";
 import Database from "../utils/db.ts";
 import { Task } from "../utils/models.ts";
 
@@ -20,6 +21,7 @@ export const getTasks: Deno.ServeHandler = async () => {
       status: 200,
       headers: {
         "Content-Type": "application/json",
+        ...headers,
       },
     });
   } catch (error) {
@@ -28,6 +30,57 @@ export const getTasks: Deno.ServeHandler = async () => {
       status: 500,
       headers: {
         "Content-Type": "text/plain",
+        ...headers,
+      },
+    });
+  }
+};
+
+export const getTask: Deno.ServeHandler = async (_req, info) => {
+  try {
+    const { params } = info as any;
+
+    if (!params?.id || !parseInt(params.id)) {
+      return new Response("Invalid or missing task ID", {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+      });
+    }
+
+    const dbRes = await db.query(
+      `SELECT id, title, description, status, dueDate FROM tasks WHERE id = ${params.id}`
+    );
+
+    if (!dbRes.length) {
+      return new Response(JSON.stringify({ message: "Task not found" }), {
+        status: 404,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+      });
+    }
+
+    const [id, title, description, status, dueDate] = dbRes[0];
+    const task = { id, title, description, status, dueDate };
+
+    return new Response(JSON.stringify(task), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching task:", error);
+    return new Response(String(error), {
+      status: 500,
+      headers: {
+        "Content-Type": "text/plain",
+        ...headers,
       },
     });
   }
@@ -59,6 +112,7 @@ export const addTask: Deno.ServeHandler = async (req) => {
         status: 201,
         headers: {
           "Content-Type": "application/json",
+          ...headers,
         },
       }
     );
@@ -68,29 +122,53 @@ export const addTask: Deno.ServeHandler = async (req) => {
       status: 500,
       headers: {
         "Content-Type": "text/plain",
+        ...headers,
       },
     });
   }
 };
 
-export const deleteTask: Deno.ServeHandler = (_req) => {
+export const deleteTask: Deno.ServeHandler = async (_req, info) => {
   try {
+    const { params } = info as any;
+
+    if (!params?.id || !parseInt(params.id)) {
+      return new Response("Task id is required", {
+        status: 400,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+      });
+    }
+
+    const query = `DELETE FROMM tasks WHERE id = ${params.id}`;
+
+    await db.execute(query);
+
     return new Response(
       JSON.stringify({ message: "Task deleted successfully" }),
       {
         status: 201,
         headers: {
           "Content-Type": "application/json",
+          ...headers,
         },
       }
     );
   } catch (error) {
-    console.error("Error adding task:", error);
-    return new Response(String(error), {
-      status: 500,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
+    return new Response(
+      JSON.stringify({
+        message: "Failed to delete task",
+        error: String(error),
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+      }
+    );
   }
 };
