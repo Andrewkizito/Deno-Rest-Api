@@ -1,5 +1,6 @@
 import { assertEquals } from "@std/assert";
 import { createStringHashMap } from "../utils/common.ts";
+import { getPathSegments } from "../router/utils.ts";
 
 Deno.test(function testHashMap() {
   assertEquals(createStringHashMap("hello"), {
@@ -12,4 +13,9 @@ Deno.test(function testHashMap() {
     h: [0],
     e: [1],
   });
+});
+
+Deno.test(function testPathSegments() {
+  assertEquals(getPathSegments("/tasks"), []);
+  assertEquals(getPathSegments("/tasks/:id"), [":id"]);
 });
