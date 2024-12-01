@@ -1,0 +1,10 @@
+{
+  "apps": [
+    {
+      "name": "tasks-deno-app",
+      "script": "deno",
+      "args": "task start",
+      "interpreter": "none"
+    }
+  ]
+}
