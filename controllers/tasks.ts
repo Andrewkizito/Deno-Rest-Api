@@ -147,7 +147,7 @@ export const deleteTask: Deno.ServeHandler = async (_req, info) => {
       });
     }
 
-    const query = `DELETE FROMM tasks WHERE id = ${params.id}`;
+    const query = `DELETE FROM tasks WHERE id = ${params.id}`;
 
     await db.execute(query);
 
