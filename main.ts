@@ -1,6 +1,6 @@
 import { addTask, deleteTask, getTask, getTasks } from "./controllers/tasks.ts";
 import { initDB } from "./utils/db.ts";
-import Router from "./utils/router.ts";
+import Router from "./router/router.ts";
 import { load } from "https://deno.land/std@0.206.0/dotenv/mod.ts";
 
 // Load environment variables from .env file
