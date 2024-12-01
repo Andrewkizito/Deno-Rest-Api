@@ -1,3 +1,4 @@
+import { logger, LogLevels } from "../utils/common.ts";
 import { getPathSegments } from "./utils.ts";
 
 type Method = "GET" | "POST" | "DELETE" | "OPTIONS";
@@ -37,6 +38,12 @@ class Router {
       const routeHandler = pathMethods[method];
 
       const res = await routeHandler?.(req, info);
+      
+      if (res?.status === 200) {
+        logger(`${res.status} ${method} - ${path}`)
+      } else {
+        logger(`${(res?.status || 500)} ${method} - ${path}`, LogLevels.ERROR)
+      }
 
       return (
         res ||
@@ -132,8 +139,9 @@ class Router {
   handler: Deno.ServeHandler = async (req, info): Promise<Response> => {
     const path = req.url.split(`${this.port}`)[1];
     const method = req.method.toUpperCase() as Method;
-
+    
     if (method === "OPTIONS") {
+      logger(`${method} - ${req.url}`)
       return new Response("", {
         status: 200,
         headers: {
